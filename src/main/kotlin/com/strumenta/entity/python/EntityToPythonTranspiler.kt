@@ -18,10 +18,10 @@ fun main() {
         module School {
             
             entity Professor {
-                first_name: string;
-                last_name: string;
-                age: integer;
-                funny: boolean;
+                first_name: string = "John";
+                last_name: string = "Doe";
+                age: integer = 30 + 15;
+                funny: boolean = true;
             }
             
             entity Course {

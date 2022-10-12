@@ -1,22 +1,9 @@
 package com.strumenta.entity.python
 
-import com.strumenta.entity.parser.BooleanType
-import com.strumenta.entity.parser.Entity
-import com.strumenta.entity.parser.EntityRefType
-import com.strumenta.entity.parser.Feature
-import com.strumenta.entity.parser.IntegerType
-import com.strumenta.entity.parser.Module
-import com.strumenta.entity.parser.StringType
+import com.strumenta.entity.parser.*
 import com.strumenta.kolasu.transformation.ASTTransformer
 import com.strumenta.kolasu.validation.Issue
-import com.strumenta.python.codegen.PyAnnAssign
-import com.strumenta.python.codegen.PyCall
-import com.strumenta.python.codegen.PyClassDef
-import com.strumenta.python.codegen.PyConstantExpr
-import com.strumenta.python.codegen.PyExprContext
-import com.strumenta.python.codegen.PyKeyword
-import com.strumenta.python.codegen.PyModule
-import com.strumenta.python.codegen.PyName
+import com.strumenta.python.codegen.*
 
 class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf()) : ASTTransformer(issues) {
 
@@ -25,6 +12,7 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
         registerEntityMapping()
         registerFeatureMapping()
         registerTypeMappings()
+        registerExpressionMappings()
     }
 
     private fun registerModuleMapping() {
@@ -47,7 +35,9 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
                 ),
                 simple = 0
             )
-        }.withChild(Feature::type, PyAnnAssign::annotation)
+        }
+            .withChild(Feature::type, PyAnnAssign::annotation)
+            .withChild(Feature::value, PyAnnAssign::value)
     }
 
     private fun registerTypeMappings() {
@@ -62,7 +52,15 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
         }
     }
 
-    // override fun asOrigin(source: Any): Origin? {
-    //     return (source as Node).origin
-    // }
+    private fun registerExpressionMappings() {
+        this.registerNodeFactory(LiteralExpression::class) { expression -> PyConstantExpr(expression.value!!) }
+        this.registerNodeFactory(BinaryExpression::class) { expression ->
+            PyBinOp(op = when (expression.operator) {
+                BinaryOperator.SUM -> PyOperator.Add
+                else -> PyOperator.Add
+            })
+        }
+            .withChild(BinaryExpression::left, PyBinOp::left)
+            .withChild(BinaryExpression::right, PyBinOp::right)
+    }
 }
