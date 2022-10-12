@@ -3,6 +3,7 @@ package com.strumenta.entity.python
 import com.strumenta.entity.parser.*
 import com.strumenta.kolasu.transformation.ASTTransformer
 import com.strumenta.kolasu.validation.Issue
+import com.strumenta.kolasu.validation.IssueSeverity
 import com.strumenta.python.codegen.*
 
 class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf()) : ASTTransformer(issues, false) {
@@ -55,9 +56,19 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
                 left = PyConstantExpr(""),
                 right = PyConstantExpr(""),
                 op = when (expression.operator) {
-                BinaryOperator.SUM -> PyOperator.Add
-                else -> PyOperator.Add
-            })
+                    BinaryOperator.SUM -> PyOperator.Add
+                    BinaryOperator.SUB -> PyOperator.Sub
+                    BinaryOperator.MUL -> PyOperator.Mult
+                    BinaryOperator.DIV -> PyOperator.Div
+                    else -> {
+                        issues.add(Issue.translation(
+                            "Unable to translate binary operator: ${expression.operator}",
+                            IssueSeverity.ERROR,
+                            expression.position
+                        ))
+                        PyOperator.Add
+                    }
+                })
         }
             .withChild(BinaryExpression::left, PyBinOp::left)
             .withChild(BinaryExpression::right, PyBinOp::right)

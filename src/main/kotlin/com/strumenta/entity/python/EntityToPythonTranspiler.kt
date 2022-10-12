@@ -21,7 +21,7 @@ fun main() {
             entity Professor {
                 first_name: string = "John";
                 last_name: string = "Doe";
-                age: integer = 30 + 15;
+                age: integer = 30 + "15";
                 funny: boolean = true;
             }
             
