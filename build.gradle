@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.0'
     implementation 'org.slf4j:slf4j-simple:2.0.0'
 
-    implementation 'com.strumenta:kolasu-python-code-generator:0.0.2-SNAPSHOT'
+    implementation 'com.strumenta:kolasu-python-code-generator:0.0.1-SNAPSHOT'
     implementation 'com.strumenta:kolasu-entity-parser:0.0.2-SNAPSHOT'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'

@@ -5,7 +5,7 @@ import com.strumenta.kolasu.transformation.ASTTransformer
 import com.strumenta.kolasu.validation.Issue
 import com.strumenta.python.codegen.*
 
-class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf()) : ASTTransformer(issues) {
+class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf()) : ASTTransformer(issues, false) {
 
     init {
         registerModuleMapping()
@@ -29,10 +29,6 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
         this.registerNodeFactory(Feature::class) { feature ->
             PyAnnAssign(
                 target = PyName(id = feature.name!!, ctx = PyExprContext.Load),
-                value = PyCall(
-                    func = PyName(id = "field", ctx = PyExprContext.Load),
-                    keywords = listOf(PyKeyword(arg = "default", value = PyConstantExpr(value = "None")))
-                ),
                 simple = 0
             )
         }
@@ -55,7 +51,10 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
     private fun registerExpressionMappings() {
         this.registerNodeFactory(LiteralExpression::class) { expression -> PyConstantExpr(expression.value!!) }
         this.registerNodeFactory(BinaryExpression::class) { expression ->
-            PyBinOp(op = when (expression.operator) {
+            PyBinOp(
+                left = PyConstantExpr(""),
+                right = PyConstantExpr(""),
+                op = when (expression.operator) {
                 BinaryOperator.SUM -> PyOperator.Add
                 else -> PyOperator.Add
             })

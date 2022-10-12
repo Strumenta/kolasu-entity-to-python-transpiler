@@ -9,6 +9,7 @@ class EntityToPythonTranspiler {
     fun transpile(code: String): String =
         EntityParser().parse(code)
             .let { EntityToPythonAstTransformer().transform(it.root!!) }
+            .let { FeatureDefaultValueTransformer().transform(it) }
             .let { PythonAstImportManager().transform(it) }
             .let { PythonCodeGenerator().generateToString(it as PyNode) }
 }
