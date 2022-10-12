@@ -62,5 +62,17 @@ class EntityToPythonAstTransformer(issues: MutableList<Issue> = mutableListOf())
         }
             .withChild(BinaryExpression::left, PyBinOp::left)
             .withChild(BinaryExpression::right, PyBinOp::right)
+        this.registerNodeFactory(FqnExpression::class) { expression ->
+            var fqnName = expression.target.name
+            var context = expression.context
+            while (context != null) {
+                fqnName = "${context.target.name}.${fqnName}"
+                context = context.context
+            }
+            PyName(
+                id = fqnName,
+                ctx = PyExprContext.Load
+            )
+        }
     }
 }

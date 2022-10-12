@@ -25,7 +25,7 @@ fun main() {
             }
             
             entity Course {
-                name: string;
+                name: string = Professor.last_name;
                 professor: Professor;
             }
             
